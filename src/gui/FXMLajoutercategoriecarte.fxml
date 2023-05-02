@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.FXMLajoutercategoriecarteController">
+   <children>
+      <VBox layoutX="34.0" layoutY="63.0" prefHeight="296.0" prefWidth="109.0" spacing="35.0">
+         <children>
+            <Label text="ID" />
+            <Label text="type" />
+            <Label text="description" />
+            <Label text="prix" />
+            <Label text="montant" />
+            <Label text="date categorie" />
+         </children>
+      </VBox>
+      <VBox layoutX="149.0" layoutY="63.0" prefHeight="332.0" prefWidth="405.0" spacing="20.0">
+         <children>
+            <TextField fx:id="id" promptText="ID" />
+            <TextField fx:id="type" promptText="type" />
+            <TextField fx:id="description" prefHeight="60.0" prefWidth="375.0" promptText="description" />
+            <TextField fx:id="prix" promptText="prix" />
+            <TextField fx:id="montant" promptText="montant" />
+            <DatePicker fx:id="date_categorie" />
+            <Button fx:id="ajouter" mnemonicParsing="false" onAction="#ajoutercategorie" prefHeight="25.0" prefWidth="95.0" text="Ajouter" textFill="#120778" />
+         </children>
+      </VBox>
+      <Button fx:id="retour" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#retour" prefHeight="25.0" prefWidth="77.0" text="retour" textFill="#120778" />
+      <Label layoutX="200.0" layoutY="9.0" text="Ajouter categorie carte" textFill="#120778">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
