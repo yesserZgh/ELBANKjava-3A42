@@ -24,6 +24,10 @@ import services.CategorieCarteServices;
 import services.ServiceOperationCredit;
 import tools.MyConnection;
 
+import javax.swing.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -103,6 +107,11 @@ public class AfficherCategorieController implements Initializable {
 
     @FXML
     private AnchorPane contenuBack;
+    @FXML
+    private TextField search;
+
+    @FXML
+    private Button exporter;
 
     @FXML
     private TableColumn<CategorieCarte, String> idcarte;
@@ -165,6 +174,33 @@ public class AfficherCategorieController implements Initializable {
 
 
         table_stade.setItems(list);
+        search.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != null && (newValue.length() < oldValue.length())) {
+                table_stade.setItems(listT);
+            }
+            String value = newValue.toLowerCase();
+            ObservableList<CategorieCarte> subentries = FXCollections.observableArrayList();
+            for (CategorieCarte entry : table_stade.getItems()) {
+                boolean match = true;
+
+                String type = entry.getType();
+                String description = entry.getDescription();
+
+
+
+                if (!type.toLowerCase().contains(value)
+                        && !description.toLowerCase().contains(value))
+                {
+                    match = false;
+                }
+                if (match) {
+                    subentries.add(entry);
+                }
+            }
+            table_stade.setItems(subentries);
+        });
+
+
 
     }
 
@@ -479,6 +515,51 @@ public class AfficherCategorieController implements Initializable {
             table_stade.getScene().setRoot(root);
         } catch (IOException ex) {
             ex.printStackTrace();
+        }
+        private String getPath() {
+            String userHome = System.getProperty("user.home");
+            String fileSeparator = System.getProperty("file.separator");
+            String documentsPath = userHome + fileSeparator + "Documents";
+            System.out.println("User's documents path: " + documentsPath);
+            return documentsPath;
+        }
+
+        @FXML
+        private void exportercategorie(ActionEvent event) {
+            try {
+                //the file path
+//            File file = new File("C:\\Users\\user\\Desktop\\image\\file.csv");
+                File file = new File(getPath() + "\\file.csv");
+
+                //if the file not exist create one
+                if (!file.exists()) {
+                    file.createNewFile();
+                } else {
+                    file.delete();
+                }
+
+                FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+
+                bw.write("id;date_categorie;type;description;prix;mantant_max;");
+                bw.newLine();
+                //loop for jtable rows
+                for (int i = 0; i < table_stade.getItems().size(); i++) {
+                    //loop for jtable column
+                    for (int j = 0; j < table_stade.getColumns().size(); j++) {
+                        bw.write(table_stade.getColumns().get(j).getCellData(i) + ";");
+                    }
+                    bw.newLine();
+                }
+                //close BufferedWriter
+                bw.close();
+                //close FileWriter
+                fw.close();
+                JOptionPane.showMessageDialog(null, "Data Exported");
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

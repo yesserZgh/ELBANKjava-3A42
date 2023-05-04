@@ -1,11 +1,9 @@
 package gui.carte;
 
 import entities.Carte;
-import entities.Utilisateur;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,24 +22,27 @@ import services.CarteServices;
 import tools.MyConnection;
 
 import javax.swing.*;
-import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
+
+import static org.apache.poi.openxml4j.opc.PackagingURIHelper.getPath;
 
 public class AjoutCarteController implements Initializable {
 
     @FXML
     private Button ComptesBack;
+
 
     @FXML
     private Button TransactionsBack;
@@ -112,6 +113,11 @@ public class AjoutCarteController implements Initializable {
 
     @FXML
     private TextField num_carte;
+    @FXML
+    private TextField search;
+
+    @FXML
+    private Button exporter;
 
     @FXML
     private AnchorPane rootPane;
@@ -166,6 +172,35 @@ public class AjoutCarteController implements Initializable {
 
 
         table_stade.setItems(list);
+
+        search.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != null && (newValue.length() < oldValue.length())) {
+                table_stade.setItems(listS);
+            }
+            String value = newValue.toLowerCase();
+            ObservableList<Carte> subentries = FXCollections.observableArrayList();
+            for (Carte entry : table_stade.getItems()) {
+                boolean match = true;
+
+                String mp = entry.getMp();
+                String login = entry.getLogin();
+                String num_carte = entry.getNum_carte();
+
+
+
+                if (!mp.toLowerCase().contains(value)
+                        && !login.toLowerCase().contains(value)
+                        && !num_carte.toLowerCase().contains(value))
+                {
+                    match = false;
+                }
+                if (match) {
+                    subentries.add(entry);
+                }
+            }
+            table_stade.setItems(subentries);
+        });
+
 
     }
     @FXML
@@ -384,7 +419,7 @@ public class AjoutCarteController implements Initializable {
     }
 
     @FXML
-    void versUtilisateursBack(ActionEvent event) {
+    String versUtilisateursBack(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../utilisateur/UtilisateurBack.fxml"));
             Parent root = loader.load();
@@ -392,6 +427,55 @@ public class AjoutCarteController implements Initializable {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        private String getPath() {
+            String userHome = System.getProperty("user.home");
+            String fileSeparator = System.getProperty("file.separator");
+            String documentsPath = userHome + fileSeparator + "Documents";
+            System.out.println("User's documents path: " + documentsPath);
+            return documentsPath;
+        }
+
+        void exporter(ActionEvent event) {
+            try {
+                //the file path
+//            File file = new File("C:\\Users\\user\\Desktop\\image\\file.csv");
+                File file = new File(getPath() + "\\file.csv");
+
+                //if the file not exist create one
+                if (!file.exists()) {
+                    file.createNewFile();
+                } else {
+                    file.delete();
+                }
+
+                FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+
+                bw.write("id;idclient;date_ex;mp;login;num_carte;");
+                bw.newLine();
+                //loop for jtable rows
+                for (int i = 0; i < table_stade.getItems().size(); i++) {
+                    //loop for jtable column
+                    for (int j = 0; j < table_stade.getColumns().size(); j++) {
+                        bw.write(table_stade.getColumns().get(j).getCellData(i) + ";");
+                    }
+                    bw.newLine();
+                }
+                //close BufferedWriter
+                bw.close();
+                //close FileWriter
+                fw.close();
+                JOptionPane.showMessageDialog(null, "Data Exported");
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+        }
+
+
+    }
     }
 
 
